@@ -32,7 +32,7 @@ interface CustomProps {
   iconAlt?: string;
   disable?: boolean;
   dateFormat?: string;
-  showTimwSelect?: boolean;
+  showTimeSelect?: boolean;
   children?: React.ReactNode;
   renderSkeleton?: (field: any) => React.ReactNode;
 }
@@ -43,7 +43,7 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
     iconSrc,
     iconAlt,
     placeholder,
-    showTimwSelect,
+    showTimeSelect,
     dateFormat,
     renderSkeleton,
   } = props;
@@ -53,7 +53,7 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
         <div className="flex rounded-md border border-dark-500 bg-dark-400">
           {props.iconSrc && (
             <Image
-              src={iconSrc}
+              src={iconSrc as string}
               height={24}
               width={24}
               alt={iconAlt || "icon"}
@@ -77,7 +77,7 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
             placeholder={placeholder}
             {...field}
             className="shad-textArea"
-            disabled={props.disabled}
+            disabled={props.disable}
           />
         </FormControl>
       );
@@ -112,7 +112,7 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
               selected={field.value}
               onChange={(date) => field.onChange(date)}
               dateFormat={dateFormat ?? "MM/dd/yyyy"}
-              showTimeSelect={showTimwSelect ?? false}
+              showTimeSelect={showTimeSelect ?? false}
               timeInputLabel="Time:"
               wrapperClassName="date-picker"
             />

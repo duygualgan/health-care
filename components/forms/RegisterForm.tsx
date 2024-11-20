@@ -42,14 +42,13 @@ const RegisterForm = ({ user }: { user: User }) => {
 
   const form = useForm<z.infer<typeof PatientFormValidation>>({
     resolver: zodResolver(PatientFormValidation),
-
-    // ts-ignore
     defaultValues: {
       ...PatientFormDefaultValues,
       name: "",
       email: "",
       phone: "",
-    },});
+    },
+  });
 
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
     setIsLoading(true);
@@ -97,13 +96,14 @@ const RegisterForm = ({ user }: { user: User }) => {
 
       // @ts-ignore
       const newPatient = await registerPatient(patient);
-
-      // @ts-ignore
+      console.log("Appwrite Yanıtı:", newPatient);
       if (newPatient) {
         router.push(`/patients/${user.$id}/new-appointment`);
+      } else {
+        console.error("Kayıt işlemi başarısız!");
       }
     } catch (error) {
-      console.log(error);
+      console.error("API Hatası:", error);
     }
     setIsLoading(false);
   };
