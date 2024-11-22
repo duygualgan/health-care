@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { Form } from "@/components/ui/form";
 import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
@@ -30,7 +30,7 @@ const AppointmentForm = ({
   patientId: string;
   type: "create" | "cancel" | "schedule";
   appointment?: Appointment;
-  setOpen: (open: boolean) => void;
+  setOpen?: Dispatch <SetStateAction<boolean>>;
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -40,18 +40,17 @@ const AppointmentForm = ({
   const form = useForm<z.infer<typeof AppointmentFormValidation>>({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
-      primaryPhysician: appointment ? appointment.primaryPhysician : '',
+      primaryPhysician: appointment ? appointment.primaryPhysician : "",
       schedule: appointment ? new Date(appointment.schedule) : new Date(),
-      reason: appointment ? appointment.reason : '',
-      note: appointment ? appointment.note : '',
-      cancellationReason:  appointment ? appointment.cancellationReason: '',
+      reason: appointment ? appointment.reason : "",
+      note: appointment ? appointment.note : "",
+      cancellationReason: appointment?.cancellationReason || "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {
+    console.log("nerdeyim");
 
-    console.log("nerdeyim")
-    
     setIsLoading(true);
 
     let status;
@@ -68,7 +67,7 @@ const AppointmentForm = ({
         status = "pending";
         break;
     }
-console.log({type})
+    console.log({ type });
     try {
       if (type === "create" && patientId) {
         const appointmentData = {
