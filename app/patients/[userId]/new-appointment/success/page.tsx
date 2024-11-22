@@ -28,7 +28,7 @@ const Success = async ({
             className="h-10 w-fit"
           />
         </Link>
-        <section className="felx flex-col items-center">
+        <section className="flex flex-col items-center">
           <Image
             src="/assets/gifs/success.gif"
             height={300}

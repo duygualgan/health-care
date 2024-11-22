@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Form } from "@/components/ui/form";
 import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
@@ -19,6 +19,12 @@ import {
 } from "@/lib/actions/appointment.action";
 import { Appointment } from "@/types/appwrite.types";
 
+export enum TypeControl {
+  Cancel = "cancel",
+  Create = "create",
+  Schedule = "schedule",
+}
+
 const AppointmentForm = ({
   userId,
   patientId,
@@ -28,48 +34,34 @@ const AppointmentForm = ({
 }: {
   userId: string;
   patientId: string;
-  type: "create" | "cancel" | "schedule";
+  type: TypeControl;
   appointment?: Appointment;
-  setOpen?: Dispatch <SetStateAction<boolean>>;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-
+  const [buttonLabel, setButtonLabel] = useState("");
+  const [statusName, setStatusName] = useState<Status>("cancelled");
   const AppointmentFormValidation = getAppointmentSchema(type);
 
   const form = useForm<z.infer<typeof AppointmentFormValidation>>({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
       primaryPhysician: appointment ? appointment.primaryPhysician : "",
-      schedule: appointment ? new Date(appointment.schedule) : new Date(),
+      schedule: appointment
+        ? new Date(appointment?.schedule)
+        : new Date(Date.now()),
       reason: appointment ? appointment.reason : "",
       note: appointment ? appointment.note : "",
-      cancellationReason: appointment?.cancellationReason || "",
+      cancellationReason: appointment?.cancellationReason ?? "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {
-    console.log("nerdeyim");
-
     setIsLoading(true);
 
-    let status;
-    switch (type) {
-      case "schedule":
-        status = "scheduled";
-        break;
-
-      case "cancel":
-        status = "cancelled";
-        break;
-
-      default:
-        status = "pending";
-        break;
-    }
-    console.log({ type });
     try {
-      if (type === "create" && patientId) {
+      if (type === TypeControl.Create && patientId) {
         const appointmentData = {
           userId,
           patient: patientId,
@@ -77,11 +69,9 @@ const AppointmentForm = ({
           schedule: new Date(values.schedule),
           note: values.note,
           reason: values.reason!,
-          status: status as Status,
+          status: statusName,
         };
         const appointment = await createAppointment(appointmentData);
-
-        console.log("Gönderilen Veriler:", appointmentData);
 
         if (appointment) {
           form.reset();
@@ -96,7 +86,7 @@ const AppointmentForm = ({
           appointment: {
             primaryPhysician: values.primaryPhysician,
             schedule: new Date(values.schedule),
-            status: status as Status,
+            status: statusName,
             cancellationReason: values.cancellationReason,
           },
           type,
@@ -114,28 +104,36 @@ const AppointmentForm = ({
     setIsLoading(false);
   }
 
-  let buttonLabel;
-  switch (type) {
-    case "cancel":
-      buttonLabel = "Cancel Appointment";
-      break;
+  useEffect(() => {
+    setButtonName();
+  }, []);
 
-    case "create":
-      buttonLabel = "Create Appointment";
-      break;
+  const setButtonName = () => {
+    switch (type) {
+      case TypeControl.Cancel:
+        setStatusName("cancelled");
+        setButtonLabel("Cancel Appointment");
+        break;
 
-    case "schedule":
-      buttonLabel = "Schedule Appointment";
-      break;
+      case TypeControl.Create:
+        setStatusName("pending");
+        setButtonLabel("Create Appointment");
+        break;
 
-    default:
-      break;
-  }
+      case TypeControl.Schedule:
+        setStatusName("scheduled");
+        setButtonLabel("Schedule Appointment");
+        break;
+
+      default:
+        break;
+    }
+  };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 felx-1">
-        {type === "create" && (
+        {type === TypeControl.Create && (
           <section className="mb-12 space-y-4">
             <h1 className="header">New Appointment</h1>
             <p className="text-dark-700">
@@ -144,7 +142,7 @@ const AppointmentForm = ({
           </section>
         )}
 
-        {type === "schedule" && (
+        {type !== TypeControl.Cancel && (
           <>
             <CustomFormField
               fieldType={FormFieldType.SELECT}
@@ -195,7 +193,7 @@ const AppointmentForm = ({
           </>
         )}
 
-        {type === "cancel" && (
+        {type === TypeControl.Cancel && (
           <CustomFormField
             fieldType={FormFieldType.TEXTAREA}
             control={form.control}
@@ -208,7 +206,7 @@ const AppointmentForm = ({
         <SubmitButton
           isLoading={isLoading}
           className={`${
-            type === "cancel" ? "shad-danger-btn" : "shad-primary-btn"
+            type === TypeControl.Cancel ? "shad-danger-btn" : "shad-primary-btn"
           } w-full`}
         >
           {buttonLabel}
