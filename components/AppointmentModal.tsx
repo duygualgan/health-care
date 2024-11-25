@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
-import AppointmentForm from "./forms/AppointmentForm";
+import AppointmentForm, { TypeControl } from "./forms/AppointmentForm";
 import { Appointment } from "@/types/appwrite.types";
 
 const AppointmentModal = ({
@@ -18,7 +18,7 @@ const AppointmentModal = ({
   userId,
   appointment,
 }: {
-  type: "schedule" | "cancel";
+  type: TypeControl;
   patientId: string;
   userId: string;
   appointment?: Appointment;
@@ -29,7 +29,7 @@ const AppointmentModal = ({
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          className={`capitalize ${type === "schedule" && "text-green-500"}`}
+          className={`capitalize ${type === TypeControl.Schedule && "text-green-500"}`}
         >
           {type}
         </Button>

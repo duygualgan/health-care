@@ -10,7 +10,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import {
   InputOTP,
   InputOTPGroup,

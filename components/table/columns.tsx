@@ -1,15 +1,13 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import StatusBadge from "../StatusBadge";
 import { formatDateTime } from "@/lib/utils";
 import { Doctors } from "@/constants";
 import Image from "next/image";
 import AppointmentModal from "../AppointmentModal";
 import { Appointment } from "@/types/appwrite.types";
+import { TypeControl } from "../forms/AppointmentForm";
 
 export const columns: ColumnDef<Appointment>[] = [
   {
@@ -70,13 +68,13 @@ export const columns: ColumnDef<Appointment>[] = [
       return (
         <div className="flex gap-1">
           <AppointmentModal
-            type="schedule"
+            type={TypeControl.Schedule}
             patientId={data.patient.$id}
             userId={data.userId}
             appointment={data}
           />
           <AppointmentModal
-            type="cancel"
+            type={TypeControl.Cancel}
             patientId={data.patient.$id}
             userId={data.userId}
             appointment={data}

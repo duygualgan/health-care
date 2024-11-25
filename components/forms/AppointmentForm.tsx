@@ -47,12 +47,10 @@ const AppointmentForm = ({
   const form = useForm<z.infer<typeof AppointmentFormValidation>>({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
-      primaryPhysician: appointment ? appointment.primaryPhysician : "",
-      schedule: appointment
-        ? new Date(appointment?.schedule)
-        : new Date(Date.now()),
-      reason: appointment ? appointment.reason : "",
-      note: appointment ? appointment.note : "",
+      primaryPhysician: appointment?.primaryPhysician || "",
+      schedule: appointment ? new Date(appointment.schedule) : new Date(),
+      reason: appointment?.reason || "",
+      note: appointment?.note || "",
       cancellationReason: appointment?.cancellationReason ?? "",
     },
   });
@@ -105,10 +103,10 @@ const AppointmentForm = ({
   }
 
   useEffect(() => {
-    setButtonName();
+    setButtonAndStatus();
   }, []);
 
-  const setButtonName = () => {
+  const setButtonAndStatus = () => {
     switch (type) {
       case TypeControl.Cancel:
         setStatusName("cancelled");
